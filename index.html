@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript Flash Card Quiz</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#fdf2f8,#eef2ff,#f0fdfa);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+padding:20px;
+overflow:hidden;
+animation:bgMove 10s infinite alternate;
+}
+
+@keyframes bgMove{
+from{
+background-position:left;
+}
+to{
+background-position:right;
+}
+}
+
+.container{
+width:420px;
+padding:28px;
+text-align:center;
+
+background:rgba(255,255,255,.65);
+backdrop-filter:blur(12px);
+
+border-radius:30px;
+
+box-shadow:
+0 8px 30px rgba(0,0,0,.08);
+
+animation:fadeUp .8s ease;
+}
+
+@keyframes fadeUp{
+
+from{
+opacity:0;
+transform:translateY(30px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+h2{
+color:#5f6caf;
+margin-bottom:15px;
+font-size:28px;
+}
+
+.progress{
+color:#666;
+font-weight:600;
+margin-bottom:15px;
+}
+
+/* Flash Card */
+
+.flashcard{
+width:100%;
+height:190px;
+perspective:1000px;
+margin:25px 0;
+cursor:pointer;
+}
+
+.card-inner{
+width:100%;
+height:100%;
+position:relative;
+transform-style:preserve-3d;
+transition:transform .8s;
+}
+
+.card-inner.flip{
+transform:rotateY(180deg);
+}
+
+.card-front,
+.card-back{
+
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+
+border-radius:25px;
+
+font-size:24px;
+font-weight:600;
+text-align:center;
+
+backface-visibility:hidden;
+
+box-shadow:
+0 6px 15px rgba(0,0,0,.08);
+}
+
+.card-front{
+background:linear-gradient(
+135deg,
+#c7d2fe,
+#ddd6fe
+);
+
+color:#4c4c7d;
+}
+
+.card-back{
+
+background:linear-gradient(
+135deg,
+#bfdbfe,
+#bae6fd
+);
+
+color:#345;
+
+transform:rotateY(180deg);
+}
+
+/* Floating effect */
+
+.flashcard:hover{
+
+animation:float 1.5s infinite ease-in-out;
+
+}
+
+@keyframes float{
+
+0%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-8px);
+}
+
+100%{
+transform:translateY(0);
+}
+
+}
+
+input{
+
+width:100%;
+padding:14px;
+
+border:none;
+outline:none;
+
+border-radius:15px;
+
+background:#f8fafc;
+
+font-size:15px;
+
+box-shadow:
+inset 0 2px 8px rgba(0,0,0,.05);
+
+transition:.3s;
+}
+
+input:focus{
+
+transform:scale(1.02);
+
+box-shadow:
+0 0 15px rgba(167,139,250,.25);
+
+}
+
+button{
+
+padding:12px 22px;
+margin-top:15px;
+
+border:none;
+border-radius:15px;
+
+background:linear-gradient(
+135deg,
+#f9a8d4,
+#c4b5fd
+);
+
+color:white;
+
+font-size:15px;
+font-weight:600;
+
+cursor:pointer;
+
+transition:.4s;
+}
+
+button:hover{
+
+transform:translateY(-3px) scale(1.04);
+
+box-shadow:
+0 8px 20px rgba(0,0,0,.12);
+
+}
+
+#nextBtn{
+display:none;
+}
+
+#result{
+margin-top:15px;
+font-weight:600;
+min-height:25px;
+color:#666;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>JavaScript Flash Card Quiz ✨</h2>
+
+<div class="progress">
+Question <span id="count">1</span>/20
+</div>
+
+<div class="flashcard" id="flashcard">
+
+<div class="card-inner" id="cardInner">
+
+<div class="card-front">
+<span id="questionText"></span>
+</div>
+
+<div class="card-back">
+<span id="answerText"></span>
+</div>
+
+</div>
+
+</div>
+
+<input
+type="text"
+id="answerBox"
+placeholder="Enter your answer">
+
+<br>
+
+<button id="submitBtn" onclick="checkAnswer()">
+Submit
+</button>
+
+<button id="nextBtn" onclick="nextQuestion()">
+Next Question
+</button>
+
+<p id="result"></p>
+
+</div>
+
+<script>
+
+// JavaScript Questions
+
+let flashcards=[
+
+{question:"JS stands for?",answer:"JavaScript"},
+{question:"Keyword to create variable?",answer:"let"},
+{question:"Print output method?",answer:"console.log"},
+{question:"Button click event?",answer:"onclick"},
+{question:"Array stores?",answer:"values"},
+{question:"Loop keyword?",answer:"for"},
+{question:"Condition keyword?",answer:"if"},
+{question:"Alternative for if?",answer:"else"},
+{question:"Function keyword?",answer:"function"},
+{question:"Value type 10?",answer:"number"},
+{question:"Value type hello?",answer:"string"},
+{question:"Boolean true or false?",answer:"boolean"},
+{question:"Select by id method?",answer:"getElementById"},
+{question:"Change HTML content property?",answer:"innerHTML"},
+{question:"Symbol for comments?",answer:"//"},
+{question:"Strict equality operator?",answer:"==="},
+{question:"Popup method?",answer:"alert"},
+{question:"Take user input method?",answer:"prompt"},
+{question:"Store many values?",answer:"array"},
+{question:"JS used for?",answer:"interactivity"}
+
+];
+
+let current=0;
+let score=0;
+let canFlip=false;
+
+const card=document.getElementById("flashcard");
+const cardInner=document.getElementById("cardInner");
+const questionText=document.getElementById("questionText");
+const answerText=document.getElementById("answerText");
+const result=document.getElementById("result");
+const answerBox=document.getElementById("answerBox");
+const count=document.getElementById("count");
+
+loadQuestion();
+
+function loadQuestion(){
+
+questionText.innerText=
+flashcards[current].question;
+
+answerText.innerText=
+flashcards[current].answer;
+
+cardInner.classList.remove("flip");
+
+answerBox.value="";
+result.innerHTML="";
+
+count.innerText=current+1;
+
+document.getElementById("submitBtn")
+.style.display="inline";
+
+document.getElementById("nextBtn")
+.style.display="none";
+
+canFlip=false;
+
+}
+
+function checkAnswer(){
+
+let userAnswer=
+answerBox.value.toLowerCase().trim();
+
+let correctAnswer=
+flashcards[current]
+.answer.toLowerCase();
+
+if(userAnswer===correctAnswer){
+
+score++;
+
+result.innerHTML=
+"✅ Correct! Tap card to reveal answer";
+
+}
+else{
+
+result.innerHTML=
+"❌ Wrong! Tap card to reveal answer";
+
+}
+
+canFlip=true;
+
+document.getElementById("submitBtn")
+.style.display="none";
+
+document.getElementById("nextBtn")
+.style.display="inline";
+
+}
+
+card.addEventListener("click",()=>{
+
+if(canFlip){
+
+cardInner.classList.toggle("flip");
+
+}
+
+});
+
+function nextQuestion(){
+
+current++;
+
+if(current<flashcards.length){
+
+loadQuestion();
+
+}
+else{
+
+document.querySelector(".container")
+.innerHTML=
+
+`<h2>Quiz Completed 🎉</h2>
+
+<h3>Your Score: ${score}/20</h3>
+
+<p style="margin:15px;">
+You answered ${score} questions correctly.
+</p>
+
+<button onclick="location.reload()">
+Play Again
+</button>`;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
