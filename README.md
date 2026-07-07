@@ -1,9 +1,9 @@
 # project-flashcard
-# 📚 JavaScript Flash Card Quiz Game
+# JavaScript Flash Card Quiz Game
 
 A beginner-friendly Flash Card Quiz Game built using **HTML, CSS, and JavaScript**. Users can answer JavaScript-based quiz questions, submit responses, flip flashcards to reveal answers, and view their final score after completing the quiz.
 
-## ✨ Features
+## Features
 
 * 20 beginner-level JavaScript questions
 * User input answer system
@@ -17,13 +17,13 @@ A beginner-friendly Flash Card Quiz Game built using **HTML, CSS, and JavaScript
 * Smooth animations and hover effects
 * Responsive layout
 
-## 🛠 Technologies Used
+## Technologies Used
 
 * HTML5
 * CSS3
 * JavaScript
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 FlashCardQuiz/
@@ -32,7 +32,7 @@ FlashCardQuiz/
 └── README.md
 ```
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
 1. Download or clone the repository
 
